@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.1.1"
+        local_v$ = "1.1.2"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -121,6 +121,7 @@ REM Init
     end
 
 200 REM Package info
+    if asc( argv$(i) ) = 118 then : ? str$( local_v$ ) : goto 100 : REM Lowercase v argument shows only the version and quits
     ? local_n$ " (" argv$(0) ") v " local_v$
     if usage then : gosub 300
     goto 100
