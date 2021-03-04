@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.1.2"
+        local_v$ = "1.1.3"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -24,6 +24,7 @@ REM Init
             if ups$( argv$(i) ) = "YN" or ups$( argv$(i) ) = "YESNO" or ups$( argv$(i) ) = "YORN" then : yesno = 1
             if ups$( left$( argv$(i), 9 ) ) = "PROGRESS=" and len( argv$(i) ) > 9 then : progress = abs( mid$( argv$(i), 10 ) )
             if ups$( left$( argv$(i), 6 ) ) = "WIDTH=" and len( argv$(i) ) > 6 then : boxwidth = abs( mid$( argv$(i), 7 ) )
+            if ups$( left$( argv$(i), 6 ) ) = "PNAME=" and len( argv$(i) ) > 6 then : pname$ = mid$(argv$(i), 7 )
             if ups$( left$( argv$(i), 6 ) ) = "TITLE=" and len( argv$(i) ) > 6 then : title$ = mid$(argv$(i), 7 )
             if ups$( left$( argv$(i), 4 ) ) = "MSG=" and len( argv$(i) ) > 4 then : msg$ = mid$( argv$(i), 5 )
             if ups$( left$( argv$(i), 4 ) ) = "BTN=" and len( argv$(i) ) > 4 then : btn$ = mid$( argv$(i), 5 )
@@ -71,6 +72,7 @@ REM Init
 
 0   REM Start Runtime (REQUIRE FUNCTIONS)
     cls
+    if pname$ <> "" then : prog$ = pname$ : local_v$ = ""
     if not titlebardisabled then : ? fntitlebar$( prog$ + " " + local_v$, th_localtime$ )
     if yesno then : goto 30
     if progress then : goto 20
@@ -135,6 +137,7 @@ REM Init
     ? " --cls            Clear screen on program exit"
     ? " --progress=<N>   Show progress bar (N must be between 0 and 100)"
     ? " --width=<N>      Box width"
+    ? " --pname=<text>   Header title"
     ? " --title=<text>   Box title"
     ? " --msg=<text>     Box message"
     ? " --btn=<text>     Info-Box button"
