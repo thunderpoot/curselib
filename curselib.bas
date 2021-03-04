@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.1.4"
+        local_v$ = "1.1.5"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -19,7 +19,7 @@ REM Init
             if left$( argv$(i), 1 ) = "/" or left$( argv$(i), 1 ) = "-" then : argv$(i) = mid$( argv$(i), 2 )
             if ups$( argv$(i) ) = "VERSION" or aups$( rgv$(i) ) = "VER" or ups$( argv$(i) ) = "V" then : goto 200
             if ups$( argv$(i) ) = "HELP" or ups$( argv$(i) ) = "H" or argv$(i) = "?" then : usage = 1 : goto 200
-            if ups$( argv$(i) ) = "NOTITLE" or ups$( argv$(i) ) = "NOTITLEBAR" or ups$( argv$(i) ) = "NOHEADER" then : titlebardisabled = 1
+            if ups$( argv$(i) ) = "NOTITLE" or ups$( argv$(i) ) = "NOHEADER" then : titlebardisabled = 1
             if ups$( argv$(i) ) = "CLS" or ups$( argv$(i) ) = "CLEAR" then : cl = 1
             if ups$( argv$(i) ) = "DEBUG" then : debug = 1
             if ups$( argv$(i) ) = "YN" or ups$( argv$(i) ) = "YESNO" or ups$( argv$(i) ) = "YORN" then : yesno = 1
@@ -71,7 +71,9 @@ REM Init
         def fnprogress$(p) = bcen$ + esc$ + "[2C" + " " + string$( int(p) / 100 * ( boxwidth - 5 ), "#" )
         def fncurses$( t$, m$ ) = btl$ + boxtop$ + chr$(10) + string$( boxheight + h, boxmid$ + crlf$ ) + boxbottom$ + chr$(10) + boxshadow$ + crlf$ + btl$ + fntitlesc$( t$ ) + fncontent$( m$, 1 )
 
-0   REM Start Runtime (REQUIRE FUNCTIONS)
+REM Runtime (REQUIRE FUNCTIONS)
+
+0   REM Start
     cls
     if pname$ <> "" then : prog$ = pname$ : local_v$ = ""
     if not titlebardisabled then : ? fntitlebar$( prog$ + " " + local_v$, th_localtime$ )
@@ -129,8 +131,9 @@ REM Init
     end
 
 200 REM Package info
-    if asc( argv$(i) ) = 118 then : ? str$( local_v$ ) : goto 100 : REM Lowercase v argument shows only the version and quits
+    if asc( argv$(i) ) = 118 then : ? str$( local_v$ ) : goto 100 : REM Lowercase 'v' argument
     ? local_n$ " (" argv$(0) ") v " local_v$
+    ? "(c) " local_c$ " " local_a$
     if usage then : gosub 300
     goto 100
 
