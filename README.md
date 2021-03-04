@@ -23,14 +23,23 @@ Usage: run curselib.bas <args>
  --msg=<text>     Box message
  --btn=<text>     Info-Box button
  --func=<cmd>     Command to execute on prompt confirmation
+```
 
 Example:
+```
 @curselib.bas --yn --msg='Hello, World!' --btn=Howdy --func='echo foo bar'
+```
 
 BASIC example:
-for i = 0 to 100 : cmd$ = "run curselib.bas progress=" + str$(i) : th_exec cmd$ : next i
+```
+@basic
+Dartmouth DTSS TeleBASIC (c) 1964,1966,1969,1970,1971,1979
+>for i = 0 to 100 : cmd$ = "run curselib.bas progress=" + str$(i) : th_exec cmd$ : next i
+```
 
 use with any loop:
-total = 25 : for i = 0 to total : cmd$ = "run curselib.bas progress=" + str$(i/total*100) : th_exec cmd$ : next i
-
+```
+@basic
+Dartmouth DTSS TeleBASIC (c) 1964,1966,1969,1970,1971,1979
+>total = 25 : for i = 0 to total : cmd$ = "run curselib.bas progress=" + str$(i/total*100) : th_exec cmd$ : next i
 ```
