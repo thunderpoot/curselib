@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.1.3"
+        local_v$ = "1.1.4"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -21,6 +21,7 @@ REM Init
             if ups$( argv$(i) ) = "HELP" or ups$( argv$(i) ) = "H" or argv$(i) = "?" then : usage = 1 : goto 200
             if ups$( argv$(i) ) = "NOTITLE" or ups$( argv$(i) ) = "NOTITLEBAR" or ups$( argv$(i) ) = "NOHEADER" then : titlebardisabled = 1
             if ups$( argv$(i) ) = "CLS" or ups$( argv$(i) ) = "CLEAR" then : cl = 1
+            if ups$( argv$(i) ) = "DEBUG" then : debug = 1
             if ups$( argv$(i) ) = "YN" or ups$( argv$(i) ) = "YESNO" or ups$( argv$(i) ) = "YORN" then : yesno = 1
             if ups$( left$( argv$(i), 9 ) ) = "PROGRESS=" and len( argv$(i) ) > 9 then : progress = abs( mid$( argv$(i), 10 ) )
             if ups$( left$( argv$(i), 6 ) ) = "WIDTH=" and len( argv$(i) ) > 6 then : boxwidth = abs( mid$( argv$(i), 7 ) )
@@ -74,7 +75,7 @@ REM Init
     cls
     if pname$ <> "" then : prog$ = pname$ : local_v$ = ""
     if not titlebardisabled then : ? fntitlebar$( prog$ + " " + local_v$, th_localtime$ )
-    if yesno then : goto 30
+    if yesno then : yn$ = "no" : goto 30
     if progress then : goto 20
 
 10  REM Simple Box
@@ -106,20 +107,25 @@ REM Init
     ekey$ = inkey$
 
 60  REM Yes / No Prompt: Draw Button Choices
-    if ekey$ = "c" then : ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynyes$ ;
-    if ekey$ = "d" then : ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynno$ ;
+    if ekey$ = "c" then : ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynyes$ ; : yn$ = "no"
+    if ekey$ = "d" then : ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynno$ ; : yn$ = "yes"
     goto 40
 
 70  REM Yes / No Prompt: Button Returned
-    if ekey$ = "c" then : exitcode = 1 : goto 100 : REM No
-    if ekey$ = "d" then : exitcode = 0 : goto 100 : REM Yes
-    
+    if yn$ = "no" then : exitcode = 1 : goto 100 : REM No
+    if yn$ = "yes" then : exitcode = 0 : goto 100 : REM Yes
+
+80  REM Debug
+    ? "Debug"
+    REM debug statements here
+    return
 
 100 REM Cleanup and Exit
     locate height,1
+    if debug then : gosub 80
     ? esc$ "[?25h" esc$ + "[K" ; : REM Show Cursor and Clear from Cursor right
     if cl then : cls
-    if exitcode = 0 then : th_exec func$
+    if not exitcode then : th_exec func$
     end
 
 200 REM Package info
