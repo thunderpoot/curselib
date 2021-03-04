@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.1.0"
+        local_v$ = "1.1.1"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -39,8 +39,8 @@ REM Init
         if title$ = "" then : title$                      = "Info"                   : REM Default Box Title
         if msg$ = "" then : msg$                          = "Continue?"              : REM Default Box Message
         if btn$ = "" then : btn$                          = "OK"                     : REM Default Button Text
-        if progress < 0 then : progress = 0                                          : REM Enforce Minimum Progress
-        if progress > 100 then : progress = 100                                      : REM Enforce Maximum Progress
+        if progress < 0 then : progress                   = 0                        : REM Enforce Minimum Progress
+        if progress > 100 then : progress                 = 100                      : REM Enforce Maximum Progress
 
     REM Box Elements
         tl$ = chr$(9484) : tr$ = chr$(9488) : bl$ = chr$(9492) : br$ = chr$(9496) : horiz$ = chr$(9472) : vert$ = chr$(9474)
@@ -61,12 +61,12 @@ REM Init
         if titlebardisabled then : btl$ = esc$ + "[H" + esc$ + "[" + str$( int( height / 2 - 2 ) - int( boxheight / 2 ) ) + "B" : nheight = height - 4
 
     REM Functions (REQUIRE VARIABLES)
-        def fnhcen$( s$ ) = esc$ + "[" + str$(width) + "D" + esc$ + "[" + str$( int( width / 2 ) - int( len( s$ ) / 2 ) ) + "C" + s$
-        def fntitlesc$( s$ ) = esc$ + "[" + str$((int(width/2)-1)-int((len(s$)-2)/2)-1) + "C" + " " + s$ + " "
-        def fnboxtitlesc$( s$ ) = boxcolour$ + fncentresc$(" " + s$ + " ")
+        def fnhcen$( s$ ) = esc$ + "[" + str$(width) + "D" + esc$ + "[" + str$( int( width / 2 ) - int( len(s$) / 2 ) ) + "C" + s$
+        def fntitlesc$( s$ ) = esc$ + "[" + str$( ( int( width / 2 ) - 1 ) - int( ( len( s$ ) - 2 ) / 2 ) - 1 ) + "C" + " " + s$ + " "
+        def fnboxtitlesc$( s$ ) = boxcolour$ + fncentresc$( " " + s$ + " " )
         def fntitlebar$( l$, r$ ) = esc$ + "[2J " + l$ + esc$ + "[" + str$( width - ( len(l$) + len(r$) ) - 2 ) + "C" + r$ + toplinesc$
         def fncontent$( s$, e ) = esc$ + "[H" + esc$ + "[" + str$( int( nheight / 2 ) - 1 + e ) + "B" + fnhcen$( s$ )
-        def fnprogress$(p) = bcen$ + esc$ + "[2C" + " " + string$(int(p)/100*(boxwidth-5),"#")
+        def fnprogress$(p) = bcen$ + esc$ + "[2C" + " " + string$( int(p) / 100 * ( boxwidth - 5 ), "#" )
         def fncurses$( t$, m$ ) = btl$ + boxtop$ + chr$(10) + string$( boxheight + h, boxmid$ + crlf$ ) + boxbottom$ + chr$(10) + boxshadow$ + crlf$ + btl$ + fntitlesc$( t$ ) + fncontent$( m$, 1 )
 
 0   REM Start Runtime (REQUIRE FUNCTIONS)
@@ -104,18 +104,19 @@ REM Init
     ekey$ = inkey$
 
 60  REM Yes / No Prompt: Draw Button Choices
-    if ekey$ = "c" then ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynyes$ ;
-    if ekey$ = "d" then ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynno$ ;
+    if ekey$ = "c" then : ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynyes$ ;
+    if ekey$ = "d" then : ? fncurses$( title$, msg$ ) : ? crlf$ fnhcen$( spc$( int( boxwidth / 8 ) + 17 ) ) esc$ "[" str$( int( boxwidth / 8 ) + 17 ) "D" ynno$ ;
     goto 40
 
 70  REM Yes / No Prompt: Button Returned
-    if ekey$ = "c" then exitcode = 1 : goto 100 : REM No
-    if ekey$ = "d" then exitcode = 0 : goto 100 : REM Yes
+    if ekey$ = "c" then : exitcode = 1 : goto 100 : REM No
+    if ekey$ = "d" then : exitcode = 0 : goto 100 : REM Yes
+    
 
 100 REM Cleanup and Exit
     locate height,1
     ? esc$ "[?25h" esc$ + "[K" ; : REM Show Cursor and Clear from Cursor right
-    if cl then cls
+    if cl then : cls
     if exitcode = 0 then : th_exec func$
     end
 
