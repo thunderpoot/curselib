@@ -83,7 +83,7 @@ REM Init
     boxheight = 6
     ? fncurses$( title$, "" ) ;
     ? fnprogress$( progress );
-    ? crlf$ crlf$ fnhcen$( str$( progress ) + " / 100" )
+    ? crlf$ crlf$ fnhcen$( str$( progress ) + " %" )
     goto 100
 
 30  REM Yes / No Prompt: Init
