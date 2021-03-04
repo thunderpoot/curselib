@@ -111,7 +111,6 @@ REM Init
 70  REM Yes / No Prompt: Button Returned
     if ekey$ = "c" then exitcode = 1 : goto 100 : REM No
     if ekey$ = "d" then exitcode = 0 : goto 100 : REM Yes
-    
 
 100 REM Cleanup and Exit
     locate height,1
