@@ -31,6 +31,6 @@ BASIC example:
 for i = 0 to 100 : cmd$ = "run curselib.bas progress=" + str$(i) : th_exec cmd$ : next i
 
 use with any loop:
-total = 25 for i = 0 to total : cmd$ = "run curselib.bas progress=" + str$(i/total*100) : th_exec cmd$ : next i
+total = 25 : for i = 0 to total : cmd$ = "run curselib.bas progress=" + str$(i/total*100) : th_exec cmd$ : next i
 
 ```
