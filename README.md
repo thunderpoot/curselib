@@ -6,6 +6,9 @@ It's written in BASIC for [Telehack](https://telehack.com).
 
 ![thcurses-demo](https://feen.us/1p6zjy.gif)
 
+### Installation
+Copy the contents of `curselib.bas` into `ped`, exit and save as `curselib.bas` with `^D`.
+
 ### Usage
 ```
 Usage: run curselib.bas <args>
