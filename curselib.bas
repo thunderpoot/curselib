@@ -90,7 +90,6 @@ REM Runtime (REQUIRE FUNCTIONS)
 0   REM Start
     cls
     if fg then : cmd$ = "\set fgcolor " + myfg$ : th_exec cmd$
-    if bg then : cmd$ = "\set bgcolor " + myfg$ : th_exec cmd$
     if pname$ <> "" then : prog$ = pname$ : local_v$ = ""
     if not titlebardisabled then : ? fntitlebar$( prog$ + " " + local_v$, th_localtime$ )
     if yesno then : yn$ = "no" : goto 30
@@ -166,7 +165,6 @@ REM Runtime (REQUIRE FUNCTIONS)
     ? esc$ "[?25h" esc$ + "[K" ; : REM Show Cursor and Clear from Cursor right
     if cl then : cls
     th_exec "\set fgcolor default"
-    th_exec "\set bgcolor default"
     cmd$ = "\rm " + outFile$ : th_exec cmd$ ; devnull$
     if getUserText then : open outFile$, as #1 : print# 1, userText$ : close #1
     if not exitcode and func$ <> "" then : th_exec func$
