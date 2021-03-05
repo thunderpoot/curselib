@@ -151,5 +151,5 @@ REM Runtime (REQUIRE FUNCTIONS)
     ? " --msg=<text>     Box message"
     ? " --btn=<text>     Info-Box button"
     ? " --func=<cmd>     Command to execute on prompt confirmation"
-    ? crlf$ "Example:" crlf$ "@" argv$(0) " --yn --msg='Hello, World!' --btn=Howdy --func='echo foo bar'"
+    ? crlf$ "Example:" crlf$ "@" argv$(0) " --yn --func='echo foo bar'"
     return
