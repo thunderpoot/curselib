@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.1.5"
+        local_v$ = "1.2.0"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -21,6 +21,8 @@ REM Init
             if ups$( argv$(i) ) = "HELP" or ups$( argv$(i) ) = "H" or argv$(i) = "?" then : usage = 1 : goto 200
             if ups$( argv$(i) ) = "NOTITLE" or ups$( argv$(i) ) = "NOHEADER" then : titlebardisabled = 1
             if ups$( argv$(i) ) = "CLS" or ups$( argv$(i) ) = "CLEAR" then : cl = 1
+            if ups$( argv$(i) ) = "INPUT" or ups$( argv$(i) ) = "INPUTBOX" then : getUserText = 1
+            if ups$( argv$(i) ) = "FORCE" then : force = 1
             if ups$( argv$(i) ) = "DEBUG" then : debug = 1
             if ups$( argv$(i) ) = "YN" or ups$( argv$(i) ) = "YESNO" or ups$( argv$(i) ) = "YORN" then : yesno = 1
             if ups$( left$( argv$(i), 9 ) ) = "PROGRESS=" and len( argv$(i) ) > 9 then : progress = abs( mid$( argv$(i), 10 ) )
@@ -30,19 +32,28 @@ REM Init
             if ups$( left$( argv$(i), 4 ) ) = "MSG=" and len( argv$(i) ) > 4 then : msg$ = mid$( argv$(i), 5 )
             if ups$( left$( argv$(i), 4 ) ) = "BTN=" and len( argv$(i) ) > 4 then : btn$ = mid$( argv$(i), 5 )
             if ups$( left$( argv$(i), 5 ) ) = "FUNC=" and len( argv$(i) ) > 5 then : func$ = mid$( argv$(i), 6 )
+            if ups$( left$( argv$(i), 6 ) ) = "COLOR=" and len( argv$(i) ) > 6 then : myfg$ = mid$( argv$(i), 7 ) : fg = 1
+            if ups$( left$( argv$(i), 7 ) ) = "COLOUR=" and len( argv$(i) ) > 7 then : myfg$ = mid$( argv$(i), 8 ) : fg = 1
+            if ups$( left$( argv$(i), 4 ) ) = "OUT=" and len( argv$(i) ) > 4 then : outFile$ = mid$( argv$(i), 5 )
         next i
 
     REM Defaults
-        minboxwidth                                       = 65                       : REM Minimum Box Width
-        boxheight                                         = 7                        : REM Default Box Height
-        if boxwidth < minboxwidth then : boxwidth         = minboxwidth              : REM Enforce Minimum Box Width
-        if boxwidth > width - 5 then : boxwidth           = width - 5                : REM Enforce Maximum Box Width
-        if title$ = "" and progress <> 0 then : title$    = "Progress"               : REM Default Progress Bar Title
-        if title$ = "" then : title$                      = "Info"                   : REM Default Box Title
-        if msg$ = "" then : msg$                          = "Continue?"              : REM Default Box Message
-        if btn$ = "" then : btn$                          = "OK"                     : REM Default Button Text
-        if progress < 0 then : progress                   = 0                        : REM Enforce Minimum Progress
-        if progress > 100 then : progress                 = 100                      : REM Enforce Maximum Progress
+        if outFile$ = "" then outFile$                           = "result.tmp"          : REM Default Output Filename
+        minboxwidth                                              = 65                    : REM Minimum Box Width
+        boxheight                                                = 7                     : REM Default Box Height
+        if boxwidth < minboxwidth then : boxwidth                = minboxwidth           : REM Enforce Minimum Box Width
+        if boxwidth > width - 5 then : boxwidth                  = width - 5             : REM Enforce Maximum Box Width
+        if title$ = "" and progress <> 0 then : title$           = "Progress"            : REM Default Progress Bar Title
+        if title$ = "" and getUserText <> 0 then : title$        = "Input"               : REM Default Text Input Box Title
+        if title$ = "" then : title$                             = "Info"                : REM Default Box Title
+        if msg$ = "" then : msg$                                 = "Continue?"           : REM Default Box Message
+        if btn$ = "" then : btn$                                 = "OK"                  : REM Default Button Text
+        if progress < 0 then : progress                          = 0                     : REM Enforce Minimum Progress
+        if progress > 100 then : progress                        = 100                   : REM Enforce Maximum Progress
+        textFieldFormatting$                                     = ""                    : REM Text Field Formatting ( e.g: esc$ + "[7m" )
+
+    REM Safety Checks
+        if not force and instr(dir$, " " + outFile$ + " ") > -1 and instr( outFile$, ".tmp" ) = -1 then : ? "%file " ups$( outFile$ ) " already exists, cannot overwrite" : end
 
     REM Box Elements
         tl$ = chr$(9484) : tr$ = chr$(9488) : bl$ = chr$(9492) : br$ = chr$(9496) : horiz$ = chr$(9472) : vert$ = chr$(9474)
@@ -60,9 +71,12 @@ REM Init
         boxbottom$ = bcen$ + bl$ + string$( boxwidth - 1, horiz$ ) + br$ + inverse$ + " " + regular$
         boxshadow$ = bcen$ + mclr$ + " " + inverse$ + spc$( boxwidth + 1 ) + regular$
         btl$ = esc$ + "[H" + esc$ + "[" + str$( int( height / 2 ) - int( boxheight / 2 ) ) + "B"
+        fieldborder$ = btl$ + crlf$ + crlf$ + bcen$ + esc$ + "[2C" + tl$ + string$( boxwidth - 5, horiz$ ) + tr$ + crlf$ + bcen$ + esc$ + "[2C" + vert$ + esc$ + "[" + str$( boxwidth - 5 ) + "C" + vert$ + crlf$ + bcen$ + esc$ + "[2C" + bl$ + string$( boxwidth - 5, horiz$ ) + br$
         if titlebardisabled then : btl$ = esc$ + "[H" + esc$ + "[" + str$( int( height / 2 - 2 ) - int( boxheight / 2 ) ) + "B" : nheight = height - 4
 
     REM Functions (REQUIRE VARIABLES)
+        def fnchomp$(s$) = left$(s$,len(s$)-2)
+        def fnreplace$(s$,f$,r$) = left$(s$,instr(s$,f$)) + r$ + mid$(s$,instr(s$,f$)+len(f$)+1)
         def fnhcen$( s$ ) = esc$ + "[" + str$(width) + "D" + esc$ + "[" + str$( int( width / 2 ) - int( len(s$) / 2 ) ) + "C" + s$
         def fntitlesc$( s$ ) = esc$ + "[" + str$( ( int( width / 2 ) - 1 ) - int( ( len( s$ ) - 2 ) / 2 ) - 1 ) + "C" + " " + s$ + " "
         def fnboxtitlesc$( s$ ) = boxcolour$ + fncentresc$( " " + s$ + " " )
@@ -75,10 +89,13 @@ REM Runtime (REQUIRE FUNCTIONS)
 
 0   REM Start
     cls
+    if fg then : cmd$ = "\set fgcolor " + myfg$ : th_exec cmd$
+    if bg then : cmd$ = "\set bgcolor " + myfg$ : th_exec cmd$
     if pname$ <> "" then : prog$ = pname$ : local_v$ = ""
     if not titlebardisabled then : ? fntitlebar$( prog$ + " " + local_v$, th_localtime$ )
     if yesno then : yn$ = "no" : goto 30
     if progress then : goto 20
+    if getUserText then : goto 80
 
 10  REM Simple Box
     ? fncurses$( title$, msg$ ) inverse$ fncontent$( "< " + btn$ + " >", 3 ) regular$ : c$ = inkey$ : if c$ <> chr$(13) goto 10
@@ -117,17 +134,42 @@ REM Runtime (REQUIRE FUNCTIONS)
     if yn$ = "no" then : exitcode = 1 : goto 100 : REM No
     if yn$ = "yes" then : exitcode = 0 : goto 100 : REM Yes
 
-80  REM Debug
+80  REM Text input prompt: Init
+    ? esc$ "[?25h" ;
+    boxheight = 6
+    ? fncurses$( title$, "" ) inverse$ fncontent$( "< " + btn$ + " >", 3 ) regular$
+    ? fieldBorder$
+
+85  REM Text input prompt: Get User Input
+    if len( userText$ ) > boxwidth-9 then : displayText$ = right$( userText$, boxwidth - 6 ) : else if len( userText$ ) <= boxwidth - 6 then : displayText$ = userText$
+    displayText$ = displayText$ + spc$( boxwidth - 5 - len( displayText$ ) )
+    ? textFieldFormatting$ btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[3C" displayText$ regular$
+    ? btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[" + str$( 3 + len( userText$ ) ) + "C" ; : REM Put cursor at end of string
+    if len( userText$ ) > boxwidth - 5 then : ? btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[" + str$( boxwidth - 3 ) + "C" ; : REM Put cursor at edge of field if text is too long
+    userKey$ = inkey$
+    if userKey$ = esc$ then : goto 85
+    if userKey$ = chr$(127) then : userText$ = left$( userText$, len( userText$ ) - 1 ) : goto 85
+    if userKey$ = chr$(13) then : goto 100
+    if asc( userKey$ ) < 32 or asc( userKey$ ) > 127 then : goto 85
+    userText$ = userText$ + userKey$
+    goto 85
+
+90  REM Debug
     ? "Debug"
     REM debug statements here
     return
 
 100 REM Cleanup and Exit
+    ? esc$ "[m" : REM Reset Character Attributes
     locate height,1
-    if debug then : gosub 80
+    if debug then : gosub 90
     ? esc$ "[?25h" esc$ + "[K" ; : REM Show Cursor and Clear from Cursor right
     if cl then : cls
-    if not exitcode then : th_exec func$
+    th_exec "\set fgcolor default"
+    th_exec "\set bgcolor default"
+    cmd$ = "\rm " + outFile$ : th_exec cmd$ ; devnull$
+    if getUserText then : open outFile$, as #1 : print# 1, userText$ : close #1
+    if not exitcode and func$ <> "" then : th_exec func$
     end
 
 200 REM Package info
@@ -143,13 +185,17 @@ REM Runtime (REQUIRE FUNCTIONS)
     ? " --help           Show this help"
     ? " --notitle        Disable the title bar"
     ? " --yn             Yes/No prompt"
+    ? " --input          Prompt for user input, output to " outFile$
+    ? " --force          Force overwrite of output file if not a temporary file"
     ? " --cls            Clear screen on program exit"
     ? " --progress=<N>   Show progress bar (N must be between 0 and 100)"
+    ? " --colour=<text>  Foreground colour ('color' is also supported)"
     ? " --width=<N>      Box width"
     ? " --pname=<text>   Header title"
     ? " --title=<text>   Box title"
     ? " --msg=<text>     Box message"
     ? " --btn=<text>     Info-Box button"
+    ? " --out=<text>     Output filename (for use with input option)"
     ? " --func=<cmd>     Command to execute on prompt confirmation"
-    ? crlf$ "Example:" crlf$ "@" argv$(0) " --yn --func='echo foo bar'"
+    ? crlf$ "Example:" crlf$ "@run " argv$(0) " --yn --func='echo foo bar'"
     return
