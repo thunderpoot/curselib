@@ -11,17 +11,22 @@ Copy the contents of `curselib.bas` into `ped`, exit and save as `curselib.bas` 
 
 ### Usage
 ```
-Usage: run curselib.bas <args>
+Usage: curselib.bas <args>
  --version        Show version info and quit
  --help           Show this help
  --notitle        Disable the title bar
  --yn             Yes/No prompt
+ --input          Prompt for user input, output to 
+ --force          Force overwrite of output file if not a temporary file
  --cls            Clear screen on program exit
  --progress=<N>   Show progress bar (N must be between 0 and 100)
+ --colour=<text>  Foreground colour ('color' is also supported)
  --width=<N>      Box width
+ --pname=<text>   Header title
  --title=<text>   Box title
  --msg=<text>     Box message
  --btn=<text>     Info-Box button
+ --out=<text>     Output filename (for use with input option)
  --func=<cmd>     Command to execute on prompt confirmation
 ```
 
