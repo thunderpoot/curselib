@@ -33,6 +33,7 @@ Examples:
 @run curselib.bas --progress=45
 ```
 
+The options may be supplied in any order.
 As with other commands, `--` is interchangeable with `/` and `-`.
 Additionally, `curselib` will allow options with no prefix at all:
 
