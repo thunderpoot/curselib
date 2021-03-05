@@ -27,10 +27,17 @@ Usage: run curselib.bas <args>
 
 Examples:
 ```
-@curselib.bas --yn --func='echo foo bar'
+@run curselib.bas --yn --func='echo foo bar'
 ```
 ```
-@curselib.bas --progress=45
+@run curselib.bas --progress=45
+```
+
+As with other commands, `--` is interchangeable with `/` and `-`.
+Additionally, `curselib` will allow options with no prefix at all:
+
+```
+@curselib yn msg="u grok?"
 ```
 
 BASIC example:
