@@ -25,9 +25,12 @@ Usage: run curselib.bas <args>
  --func=<cmd>     Command to execute on prompt confirmation
 ```
 
-Example:
+Examples:
 ```
-@curselib.bas --yn --msg='Hello, World!' --btn=Howdy --func='echo foo bar'
+@curselib.bas --yn --func='echo foo bar'
+```
+```
+@curselib.bas --progress=45
 ```
 
 BASIC example:
