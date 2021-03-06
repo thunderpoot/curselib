@@ -173,7 +173,7 @@ REM Runtime (REQUIRE FUNCTIONS)
 
 200 REM Package info
     pagertmpfile$ = left$( th_md5hex$( rnd(1e6) ), 5 ) + ".tmp" : open pagertmpfile$, as #1
-    if asc( argv$(i) ) = 118 then : ? str$( local_v$ ) : goto 100 : REM Lowercase 'v' argument
+    if asc( argv$(i) ) = 118 then close #1 : ? str$( local_v$ ) : end : REM Lowercase 'v' argument
     ?# 1, local_n$ + " (" + argv$(0) + ") v " + local_v$
     ?# 1, " "
     ?# 1, "This file was written by underwood <underwood@telehack.com>."
