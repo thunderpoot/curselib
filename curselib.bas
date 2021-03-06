@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.2.1"
+        local_v$ = "1.2.2"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -22,6 +22,7 @@ REM Init
             if ups$( argv$(i) ) = "NOTITLE" or ups$( argv$(i) ) = "NOHEADER" then : titlebardisabled = 1
             if ups$( argv$(i) ) = "CLS" or ups$( argv$(i) ) = "CLEAR" then : cl = 1
             if ups$( argv$(i) ) = "INPUT" or ups$( argv$(i) ) = "INPUTBOX" then : getUserText = 1
+            if ups$( argv$(i) ) = "PASS" or ups$( argv$(i) ) = "PASSWORD" or ups$( argv$(i) ) = "PASSWD" then : getUserText = 1 : passwd = 1 : cl = 1
             if ups$( argv$(i) ) = "FORCE" then : force = 1
             if ups$( argv$(i) ) = "DEBUG" then : debug = 1
             if ups$( argv$(i) ) = "YN" or ups$( argv$(i) ) = "YESNO" or ups$( argv$(i) ) = "YORN" then : yesno = 1
@@ -43,8 +44,9 @@ REM Init
         boxheight                                                = 7                     : REM Default Box Height
         if boxwidth < minboxwidth then : boxwidth                = minboxwidth           : REM Enforce Minimum Box Width
         if boxwidth > width - 5 then : boxwidth                  = width - 5             : REM Enforce Maximum Box Width
-        if title$ = "" and progress <> 0 then : title$           = "Progress"            : REM Default Progress Bar Title
-        if title$ = "" and getUserText <> 0 then : title$        = "Input"               : REM Default Text Input Box Title
+        if title$ = "" and progress then : title$                = "Progress"            : REM Default Progress Bar Title
+        if passwd then : title$                                  = "Password"            : REM Default Password Input Box Title
+        if title$ = "" and getUserText then : title$             = "Input"               : REM Default Text Input Box Title
         if title$ = "" then : title$                             = "Info"                : REM Default Box Title
         if msg$ = "" then : msg$                                 = "Continue?"           : REM Default Box Message
         if btn$ = "" then : btn$                                 = "OK"                  : REM Default Button Text
@@ -87,7 +89,7 @@ REM Init
 
 REM Runtime (REQUIRE FUNCTIONS)
 
-0   REM Start
+0   if local_n$ = "" or fncurses$(1,1) = "" then : ? "%could not load curselib, please reinstall " argv$(0) : end REM Assert
     cls
     if fg then : cmd$ = "\set fgcolor " + myfg$ : th_exec cmd$
     if pname$ <> "" then : prog$ = pname$ : local_v$ = ""
@@ -141,6 +143,7 @@ REM Runtime (REQUIRE FUNCTIONS)
 
 85  REM Text input prompt: Get User Input
     if len( userText$ ) > boxwidth-9 then : displayText$ = right$( userText$, boxwidth - 6 ) : else if len( userText$ ) <= boxwidth - 6 then : displayText$ = userText$
+    if len( userText$ ) > boxwidth-9 and passwd then : displayText$ = string$( boxwidth - 6, "*" ) : else if len( userText$ ) <= boxwidth - 6 and passwd then : displayText$ = string$( len( userText$ ), "*" )
     displayText$ = displayText$ + spc$( boxwidth - 5 - len( displayText$ ) )
     ? textFieldFormatting$ btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[3C" displayText$ regular$
     ? btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[" + str$( 3 + len( userText$ ) ) + "C" ; : REM Put cursor at end of string
@@ -176,10 +179,11 @@ REM Runtime (REQUIRE FUNCTIONS)
     if asc( argv$(i) ) = 118 then close #1 : ? str$( local_v$ ) : end : REM Lowercase 'v' argument
     ?# 1, local_n$ + " (" + argv$(0) + ") v " + local_v$
     ?# 1, " "
-    ?# 1, "This file was written by underwood <underwood@telehack.com>."
+    ?# 1, "This file was written by UNDERWOOD <" + local_a$ + "> for Telehack (telehack.com)."
     ?# 1, " "
     ?# 1, "The GNU Public Licenses in https://github.com/thunderpoot/curselib/blob/main/LICENSE were taken from ftp.gnu.org and are copyrighted by the Free Software Foundation, Inc."
-    ?# 1, "Copyright (C) " + local_c$ + " " + local_a$ + "."
+    ?# 1, " "
+    ?# 1, left$( argv$(0), instr( argv$(0), ".bas" ) ) + " copyright (C) " + local_c$ + " Telehack."
     ?# 1, " "
     ?# 1, "This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version."
     ?# 1, "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details."
@@ -196,6 +200,7 @@ REM Runtime (REQUIRE FUNCTIONS)
     ?# 1, " --notitle        Disable the title bar"
     ?# 1, " --yn             Yes/No prompt"
     ?# 1, " --input          Prompt for user input, output to file (see: DEFAULTS)"
+    ?# 1, " --pass           Prompt for password, output to file (see: DEFAULTS)"
     ?# 1, " --force          Force overwrite of output file"
     ?# 1, " --cls            Clear screen on program exit"
     ?# 1, " --progress=<N>   Show progress bar (N must be between 0 and 100)"
@@ -207,7 +212,8 @@ REM Runtime (REQUIRE FUNCTIONS)
     ?# 1, " --btn=<text>     Info-Box button label"
     ?# 1, " --out=<text>     Output filename (for use with input option)"
     ?# 1, " --func=<cmd>     Command to execute on prompt confirmation"
-    ?# 1, "Example:" "@run " + argv$(0) + " --yn --func='echo foo bar'"
+    ?# 1, "Examples:" "@run " + argv$(0) + " --yn --func='echo foo bar'"
+    ?# 1, "@run " + argv$(0) + " --input --title='What is the airspeed velocity of an unladen swallow?' --btn='Continue'"
     close #1
     cmd$ = "\less " + pagertmpfile$ : th_exec cmd$
     cmd$ = "\rm " + pagertmpfile$ : th_exec cmd$ ; devnull$
