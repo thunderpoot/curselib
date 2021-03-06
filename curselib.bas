@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.2.7"
+        local_v$ = "1.2.8"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -119,7 +119,6 @@ REM Runtime (REQUIRE FUNCTIONS)
     if isList then : goto 15
 
 10  REM Simple Box
-    
     ? fncurses$( title$, msg$ ) inverse$ fncontent$( "< " + btn$ + " >", 3 ) regular$ : c$ = inkey$ : if c$ <> chr$(13) goto 10
     goto 100
 
@@ -137,6 +136,7 @@ REM Runtime (REQUIRE FUNCTIONS)
     if nchoices > boxheight - 2 then ? "%too many list elements" : goto 115
 
     boxheight = 6 + nchoices mod(2)
+    if nchoices < boxheight then boxheight = nchoices + 2
     limit$ = str$( boxheight - 18 )
     nup = nchoices - 8
 
@@ -147,11 +147,11 @@ REM Runtime (REQUIRE FUNCTIONS)
     for p = offset to boxheight - 2 :
         if instr( myChoices$(p), delim$ ) <> -1 then : myChoices$(p) = fnreplace$( myChoices$(p), delim$, "" )
         if len( myChoices$(p) ) > boxwidth - 14 then : displaychoice$ = left$( myChoices$(p), boxwidth - 14 ) + "..." else if len( myChoices$(p) ) <= boxwidth - 14 then : displaychoice$ = myChoices$(p)
-        ? bcen$ esc$ "[2C [" ;
-        if p = currentchoice then : ? "X" ;
-        if p <> currentchoice then : ? " " ;
-        ? "]  " ;
-        ? displaychoice$
+        if displaychoice$ <> "" then : ? bcen$ esc$ "[2C [" ;
+        if displaychoice$ <> "" then : if p = currentchoice then : ? "X" ;
+        if displaychoice$ <> "" then : if p <> currentchoice then : ? " " ;
+        if displaychoice$ <> "" then : ? "]  " ;
+        if displaychoice$ <> "" then : ? displaychoice$
     next p
 rem    if currentchoice < nchoices and nchoices - currentchoice < boxheight - 2 then : for pl = currentchoice to nchoices : ? bcen$ esc$ "[2C [ ]  " myChoices$(pl+1) ;
 
