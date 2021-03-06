@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.2.2"
+        local_v$ = "1.2.7"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -25,17 +25,20 @@ REM Init
             if ups$( argv$(i) ) = "PASS" or ups$( argv$(i) ) = "PASSWORD" or ups$( argv$(i) ) = "PASSWD" then : getUserText = 1 : passwd = 1 : cl = 1
             if ups$( argv$(i) ) = "FORCE" then : force = 1
             if ups$( argv$(i) ) = "DEBUG" then : debug = 1
+            if ups$( argv$(i) ) = "TRON" then : tron
             if ups$( argv$(i) ) = "YN" or ups$( argv$(i) ) = "YESNO" or ups$( argv$(i) ) = "YORN" then : yesno = 1
             if ups$( left$( argv$(i), 9 ) ) = "PROGRESS=" and len( argv$(i) ) > 9 then : progress = abs( mid$( argv$(i), 10 ) )
+            if ups$( left$( argv$(i), 5 ) ) = "LIST=" and len( argv$(i) ) > 5 then : choicesText$ = mid$( argv$(i), 6 ) : isList = 1 : titlebardisabled = 1
             if ups$( left$( argv$(i), 6 ) ) = "WIDTH=" and len( argv$(i) ) > 6 then : boxwidth = abs( mid$( argv$(i), 7 ) )
             if ups$( left$( argv$(i), 6 ) ) = "PNAME=" and len( argv$(i) ) > 6 then : pname$ = mid$(argv$(i), 7 )
             if ups$( left$( argv$(i), 6 ) ) = "TITLE=" and len( argv$(i) ) > 6 then : title$ = mid$(argv$(i), 7 )
             if ups$( left$( argv$(i), 4 ) ) = "MSG=" and len( argv$(i) ) > 4 then : msg$ = mid$( argv$(i), 5 )
             if ups$( left$( argv$(i), 4 ) ) = "BTN=" and len( argv$(i) ) > 4 then : btn$ = mid$( argv$(i), 5 )
             if ups$( left$( argv$(i), 5 ) ) = "FUNC=" and len( argv$(i) ) > 5 then : func$ = mid$( argv$(i), 6 )
+            if ups$( left$( argv$(i), 6 ) ) = "DELIM=" and len( argv$(i) ) > 6 then : delim$ = mid$( argv$(i), 7 ) : fg = 1
             if ups$( left$( argv$(i), 6 ) ) = "COLOR=" and len( argv$(i) ) > 6 then : myfg$ = mid$( argv$(i), 7 ) : fg = 1
             if ups$( left$( argv$(i), 7 ) ) = "COLOUR=" and len( argv$(i) ) > 7 then : myfg$ = mid$( argv$(i), 8 ) : fg = 1
-            if ups$( left$( argv$(i), 4 ) ) = "OUT=" and len( argv$(i) ) > 4 then : outFile$ = mid$( argv$(i), 5 )
+            if ups$( left$( argv$(i), 4 ) ) = "OUT=" and len( argv$(i) ) > 4 then : outFile$ = mid$( argv$(i), 5 ) : out = 1
         next i
 
     REM Defaults
@@ -44,18 +47,33 @@ REM Init
         boxheight                                                = 7                     : REM Default Box Height
         if boxwidth < minboxwidth then : boxwidth                = minboxwidth           : REM Enforce Minimum Box Width
         if boxwidth > width - 5 then : boxwidth                  = width - 5             : REM Enforce Maximum Box Width
-        if title$ = "" and progress then : title$                = "Progress"            : REM Default Progress Bar Title
-        if passwd then : title$                                  = "Password"            : REM Default Password Input Box Title
-        if title$ = "" and getUserText then : title$             = "Input"               : REM Default Text Input Box Title
-        if title$ = "" then : title$                             = "Info"                : REM Default Box Title
-        if msg$ = "" then : msg$                                 = "Continue?"           : REM Default Box Message
+        if title$ = "" and progress then : title$                = " Progress "          : REM Default Progress Bar Title
+        if passwd then : title$                                  = " Password "          : REM Default Password Input Box Title
+        if title$ = "" and isList then : title$                  = " Choose from List "  : REM Default Text Input Box Title
+        if title$ = "" and getUserText then : title$             = " Input "             : REM Default Text Input Box Title
+        if title$ = "" then : title$                             = " Info "              : REM Default Box Title
+        if msg$ = "" then : msg$                                 = " Continue? "         : REM Default Box Message
         if btn$ = "" then : btn$                                 = "OK"                  : REM Default Button Text
+        if delim$ = "" then : delim$                             = ","                   : REM Default List Delimiter
         if progress < 0 then : progress                          = 0                     : REM Enforce Minimum Progress
         if progress > 100 then : progress                        = 100                   : REM Enforce Maximum Progress
         textFieldFormatting$                                     = ""                    : REM Text Field Formatting ( e.g: esc$ + "[7m" )
+        if left$( title$, 1 ) <> " " or right$( title$, 1 ) <> " " then title$ = " " + title + " "
 
     REM Safety Checks
-        if not force and instr(dir$, " " + outFile$ + " ") > -1 and instr( outFile$, ".tmp" ) = -1 then : ? "%file " ups$( outFile$ ) " already exists, cannot overwrite" : end
+
+        REM Filename length check
+        if len( outFile$ ) > 15 then : ? "%invalid filename" : goto 115
+
+        REM Check for illegal chars in filename
+        if out then : ? outFile$
+        if out then :    for n = 0 to len( outFile$ ) :
+        if out then :        c = asc( mid$( outFile$, n, 1 ) )
+        if out then :        if ( c < 65 and chr$(c) <> "." and c <> 52 ) or ( c > 90 and c < 97 ) or c > 122 then : ? "%invalid filename char: " chr$(c) : goto 115
+        if out then :    next
+
+        REM Clobber check
+        if not force and instr( dir$, " " + outFile$ + " " ) > -1 and instr( outFile$, ".tmp" ) = -1 then : ? "%file " ups$( outFile$ ) " already exists, cannot overwrite" : goto 115
 
     REM Box Elements
         tl$ = chr$(9484) : tr$ = chr$(9488) : bl$ = chr$(9492) : br$ = chr$(9496) : horiz$ = chr$(9472) : vert$ = chr$(9474)
@@ -73,33 +91,86 @@ REM Init
         boxbottom$ = bcen$ + bl$ + string$( boxwidth - 1, horiz$ ) + br$ + inverse$ + " " + regular$
         boxshadow$ = bcen$ + mclr$ + " " + inverse$ + spc$( boxwidth + 1 ) + regular$
         btl$ = esc$ + "[H" + esc$ + "[" + str$( int( height / 2 ) - int( boxheight / 2 ) ) + "B"
-        fieldborder$ = btl$ + crlf$ + crlf$ + bcen$ + esc$ + "[2C" + tl$ + string$( boxwidth - 5, horiz$ ) + tr$ + crlf$ + bcen$ + esc$ + "[2C" + vert$ + esc$ + "[" + str$( boxwidth - 5 ) + "C" + vert$ + crlf$ + bcen$ + esc$ + "[2C" + bl$ + string$( boxwidth - 5, horiz$ ) + br$
         if titlebardisabled then : btl$ = esc$ + "[H" + esc$ + "[" + str$( int( height / 2 - 2 ) - int( boxheight / 2 ) ) + "B" : nheight = height - 4
+        fieldborder$ = btl$ + crlf$ + crlf$ + bcen$ + esc$ + "[2C" + tl$ + string$( boxwidth - 5, horiz$ ) + tr$ + crlf$ + bcen$ + esc$ + "[2C" + vert$ + esc$ + "[" + str$( boxwidth - 5 ) + "C" + vert$ + crlf$ + bcen$ + esc$ + "[2C" + bl$ + string$( boxwidth - 5, horiz$ ) + br$
 
     REM Functions (REQUIRE VARIABLES)
         def fnchomp$(s$) = left$(s$,len(s$)-2)
         def fnreplace$(s$,f$,r$) = left$(s$,instr(s$,f$)) + r$ + mid$(s$,instr(s$,f$)+len(f$)+1)
         def fnhcen$( s$ ) = esc$ + "[" + str$(width) + "D" + esc$ + "[" + str$( int( width / 2 ) - int( len(s$) / 2 ) ) + "C" + s$
-        def fntitlesc$( s$ ) = esc$ + "[" + str$( ( int( width / 2 ) - 1 ) - int( ( len( s$ ) - 2 ) / 2 ) - 1 ) + "C" + " " + s$ + " "
-        def fnboxtitlesc$( s$ ) = boxcolour$ + fncentresc$( " " + s$ + " " )
+        def fntitlesc$( s$ ) = esc$ + "[" + str$( ( int( width / 2 ) - 1 ) - int( ( len( s$ ) - 2 ) / 2 ) - 1 ) + "C" + s$
+        def fnboxtitlesc$( s$ ) = boxcolour$ + fncentresc$( s$ )
         def fntitlebar$( l$, r$ ) = esc$ + "[2J " + l$ + esc$ + "[" + str$( width - ( len(l$) + len(r$) ) - 2 ) + "C" + r$ + toplinesc$
         def fncontent$( s$, e ) = esc$ + "[H" + esc$ + "[" + str$( int( nheight / 2 ) - 1 + e ) + "B" + fnhcen$( s$ )
         def fnprogress$(p) = bcen$ + esc$ + "[2C" + " " + string$( int(p) / 100 * ( boxwidth - 5 ), "#" )
-        def fncurses$( t$, m$ ) = btl$ + boxtop$ + chr$(10) + string$( boxheight + h, boxmid$ + crlf$ ) + boxbottom$ + chr$(10) + boxshadow$ + crlf$ + btl$ + fntitlesc$( t$ ) + fncontent$( m$, 1 )
+        def fncurses$( t$, m$ ) = btl$ + boxtop$ + chr$(10) + string$( boxheight + 1, boxmid$ + crlf$ ) + boxbottom$ + chr$(10) + boxshadow$ + crlf$ + btl$ + fntitlesc$( t$ ) + fncontent$( m$, 1 )
 
 REM Runtime (REQUIRE FUNCTIONS)
 
-0   if local_n$ = "" or fncurses$(1,1) = "" then : ? "%could not load curselib, please reinstall " argv$(0) : end REM Assert
+0   if local_n$ = "" or fncurses$(1,1) = "" then : ? "%could not load curselib, please reinstall " argv$(0) : goto 115 REM Assert
     cls
-    if fg then : cmd$ = "\set fgcolor " + myfg$ : th_exec cmd$
+
+    if fg then : gosub 400
     if pname$ <> "" then : prog$ = pname$ : local_v$ = ""
     if not titlebardisabled then : ? fntitlebar$( prog$ + " " + local_v$, th_localtime$ )
     if yesno then : yn$ = "no" : goto 30
     if progress then : goto 20
     if getUserText then : goto 80
+    if isList then : goto 15
 
 10  REM Simple Box
+    
     ? fncurses$( title$, msg$ ) inverse$ fncontent$( "< " + btn$ + " >", 3 ) regular$ : c$ = inkey$ : if c$ <> chr$(13) goto 10
+    goto 100
+
+15  REM Choose from List: Init
+
+    pheight = height
+    pwidth = width
+
+    if not initialised then for l = 1 to len( choicesText$ ) :
+    if not initialised then     if mid$( choicesText$, l, 1 ) = delim$ then : nchoices = nchoices + 1 : if right$( choicesText$, 1 ) <> delim$ then : next l
+    if not initialised then     myChoices$( nchoices ) = myChoices$( nchoices ) + mid$( choicesText$, l, 1 )
+    if not initialised then next l
+    initialised = 1
+
+    if nchoices > boxheight - 2 then ? "%too many list elements" : goto 115
+
+    boxheight = 6 + nchoices mod(2)
+    limit$ = str$( boxheight - 18 )
+    nup = nchoices - 8
+
+
+16  REM Choose from List: Print Choices
+    ? fncurses$( title$, "" )
+    home : ? btl$ crlf$
+    for p = offset to boxheight - 2 :
+        if instr( myChoices$(p), delim$ ) <> -1 then : myChoices$(p) = fnreplace$( myChoices$(p), delim$, "" )
+        if len( myChoices$(p) ) > boxwidth - 14 then : displaychoice$ = left$( myChoices$(p), boxwidth - 14 ) + "..." else if len( myChoices$(p) ) <= boxwidth - 14 then : displaychoice$ = myChoices$(p)
+        ? bcen$ esc$ "[2C [" ;
+        if p = currentchoice then : ? "X" ;
+        if p <> currentchoice then : ? " " ;
+        ? "]  " ;
+        ? displaychoice$
+    next p
+rem    if currentchoice < nchoices and nchoices - currentchoice < boxheight - 2 then : for pl = currentchoice to nchoices : ? bcen$ esc$ "[2C [ ]  " myChoices$(pl+1) ;
+
+18  REM Choose from List: Get User Input
+    key$ = inkey$
+    if key$ = chr$(13) then goto 19
+    if key$ <> esc$ then goto 18
+    key$ = inkey$ : if key$ <> "[" then goto 18
+    ekey$ = inkey$
+
+    if ekey$ = "a" then : currentchoice = currentchoice - 1
+    if ekey$ = "b" then : currentchoice = currentchoice + 1
+    if currentchoice < 0 then currentchoice = 0
+    if currentchoice > nchoices then currentchoice = nchoices
+
+    goto 16
+
+19  REM Confirm Choice and Continue
+    out = 1 : userText$ = myChoices$( currentchoice )
     goto 100
 
 20  REM Progress Bar
@@ -147,8 +218,10 @@ REM Runtime (REQUIRE FUNCTIONS)
     displayText$ = displayText$ + spc$( boxwidth - 5 - len( displayText$ ) )
     ? textFieldFormatting$ btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[3C" displayText$ regular$
     ? btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[" + str$( 3 + len( userText$ ) ) + "C" ; : REM Put cursor at end of string
-    if len( userText$ ) > boxwidth - 5 then : ? btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[" + str$( boxwidth - 3 ) + "C" ; : REM Put cursor at edge of field if text is too long
+    if len( userText$ ) > boxwidth - 5 then : ? btl$ crlf$ crlf$ crlf$ bcen$ esc$ "[" + str$( boxwidth - 3 ) + "C" ; : REM Put cursor at right edge of field
+    ? esc$ "[?25h" ; : REM Show Cursor
     userKey$ = inkey$
+    ? esc$ "[?25l" ; : REM Hide Cursor
     if userKey$ = esc$ then : goto 85
     if userKey$ = chr$(127) then : userText$ = left$( userText$, len( userText$ ) - 1 ) : goto 85
     if userKey$ = chr$(13) then : goto 100
@@ -161,22 +234,26 @@ REM Runtime (REQUIRE FUNCTIONS)
     REM debug statements here
     return
 
-100 REM Cleanup and Exit
+100 REM Cleanup
     ? esc$ "[m" ; : REM Reset Character Attributes
-    if usage then end
+    ? esc$ "[?25h" ; : REM Show Cursor
+    if usage then goto 115
     locate height,1
     if debug then : gosub 90
     ? esc$ "[?25h" esc$ + "[K" ; : REM Show Cursor and Clear from Cursor right
     if cl then : cls
-    th_exec "\set fgcolor default"
+105 REM Output to file
+    if not out then goto 115
     cmd$ = "\rm " + outFile$ : th_exec cmd$ ; devnull$
-    if getUserText then : open outFile$, as #1 : print# 1, userText$ : close #1
+    if isList or getUserText then : open outFile$, as #1 : print# 1, userText$ : close #1
+110 REM Execute
     if not exitcode and func$ <> "" then : th_exec func$
+115 REM Exit
     end
 
 200 REM Package info
     pagertmpfile$ = left$( th_md5hex$( rnd(1e6) ), 5 ) + ".tmp" : open pagertmpfile$, as #1
-    if asc( argv$(i) ) = 118 then close #1 : ? str$( local_v$ ) : end : REM Lowercase 'v' argument
+    if asc( argv$(i) ) = 118 then close #1 : ? str$( local_v$ ) : goto 115 : REM Lowercase 'v' argument
     ?# 1, local_n$ + " (" + argv$(0) + ") v " + local_v$
     ?# 1, " "
     ?# 1, "This file was written by UNDERWOOD <" + local_a$ + "> for Telehack (telehack.com)."
@@ -195,26 +272,44 @@ REM Runtime (REQUIRE FUNCTIONS)
 300 REM Usage info
     ?# 1, " "
     ?# 1, "Usage: " + argv$(0) + " <args>"
-    ?# 1, " --version        Show version info and quit"
-    ?# 1, " --help           Show this help"
-    ?# 1, " --notitle        Disable the title bar"
-    ?# 1, " --yn             Yes/No prompt"
-    ?# 1, " --input          Prompt for user input, output to file (see: DEFAULTS)"
-    ?# 1, " --pass           Prompt for password, output to file (see: DEFAULTS)"
-    ?# 1, " --force          Force overwrite of output file"
-    ?# 1, " --cls            Clear screen on program exit"
-    ?# 1, " --progress=<N>   Show progress bar (N must be between 0 and 100)"
-    ?# 1, " --colour=<text>  Foreground colour ('color' is also supported)"
-    ?# 1, " --width=<N>      Box width"
-    ?# 1, " --pname=<text>   Header title"
-    ?# 1, " --title=<text>   Box title"
-    ?# 1, " --msg=<text>     Box message"
-    ?# 1, " --btn=<text>     Info-Box button label"
-    ?# 1, " --out=<text>     Output filename (for use with input option)"
-    ?# 1, " --func=<cmd>     Command to execute on prompt confirmation"
-    ?# 1, "Examples:" "@run " + argv$(0) + " --yn --func='echo foo bar'"
-    ?# 1, "@run " + argv$(0) + " --input --title='What is the airspeed velocity of an unladen swallow?' --btn='Continue'"
+    ?# 1, " /version        Show version info and quit"
+    ?# 1, " /help           Show this help"
+    ?# 1, " /notitle        Disable the title bar"
+    ?# 1, " /yn             Yes/No prompt"
+    ?# 1, " /input          Prompt for user input, output to file (see: DEFAULTS)"
+    ?# 1, " /pass           Prompt for password, output to file (see: DEFAULTS)"
+    ?# 1, " /force          Force overwrite of output file"
+    ?# 1, " /cls            Clear screen on program exit"
+    ?# 1, " /progress=<N>   Show progress bar (N must be between 0 and 100)"
+    ?# 1, " /colour=<text>  Foreground colour ('color' is also supported)"
+    ?# 1, " /width=<N>      Box width"
+    ?# 1, " /pname=<text>   Header title"
+    ?# 1, " /title=<text>   Box title"
+    ?# 1, " /msg=<text>     Box message"
+    ?# 1, " /btn=<text>     Info-Box button label"
+    ?# 1, " /list=<text>    Display a list (max 6 elements)"
+    ?# 1, " /delim=<text>   Custom list delimiter (defaults to comma)"
+    ?# 1, " /out=<text>     Output filename (for use with input option)"
+    ?# 1, " /func=<cmd>     Command to execute on prompt confirmation"
+    ?# 1, " "
+    ?# 1, " Prepending options with / is optional, and interchangeable with - (hyphen) and -- (double hyphen)."
+    ?# 1, " "
+    ?# 1, "Examples:" "@run " + argv$(0) + " -yn --func='echo foo bar'"
+    ?# 1, "@run " + argv$(0) + " /progress=50"
+    ?# 1, "@run " + argv$(0) + " list=hello,world,foo,bar"
+    ?# 1, "@run " + argv$(0) + " input title='What is the airspeed velocity of an unladen swallow?' btn='Continue'"
     close #1
     cmd$ = "\less " + pagertmpfile$ : th_exec cmd$
     cmd$ = "\rm " + pagertmpfile$ : th_exec cmd$ ; devnull$
+    return
+
+400 REM Colours
+    if ups$( myfg$ ) = "CYAN" then : ? esc$ "[36m" ;
+    if ups$( myfg$ ) = "MAGENTA" then : ? esc$ "[35m" ;
+    if ups$( myfg$ ) = "YELLOW" then : ? esc$ "[33m" ;
+    if ups$( myfg$ ) = "BLACK" then : ? esc$ "[30m" ;
+    if ups$( myfg$ ) = "RED" then : ? esc$ "[31m" ;
+    if ups$( myfg$ ) = "GREEN" then : ? esc$ "[32m" ;
+    if ups$( myfg$ ) = "BLUE" then : ? esc$ "[34m" ;
+    if ups$( myfg$ ) = "WHITE" then : ? esc$ "[37m" ;
     return
