@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.2.0"
+        local_v$ = "1.2.1"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -159,7 +159,8 @@ REM Runtime (REQUIRE FUNCTIONS)
     return
 
 100 REM Cleanup and Exit
-    ? esc$ "[m" : REM Reset Character Attributes
+    ? esc$ "[m" ; : REM Reset Character Attributes
+    if usage then end
     locate height,1
     if debug then : gosub 90
     ? esc$ "[?25h" esc$ + "[K" ; : REM Show Cursor and Clear from Cursor right
@@ -171,29 +172,43 @@ REM Runtime (REQUIRE FUNCTIONS)
     end
 
 200 REM Package info
+    pagertmpfile$ = left$( th_md5hex$( rnd(1e6) ), 5 ) + ".tmp" : open pagertmpfile$, as #1
     if asc( argv$(i) ) = 118 then : ? str$( local_v$ ) : goto 100 : REM Lowercase 'v' argument
-    ? local_n$ " (" argv$(0) ") v " local_v$
-    ? "(c) " local_c$ " " local_a$
-    if usage then : gosub 300
+    ?# 1, local_n$ + " (" + argv$(0) + ") v " + local_v$
+    ?# 1, " "
+    ?# 1, "This file was written by underwood <underwood@telehack.com>."
+    ?# 1, " "
+    ?# 1, "The GNU Public Licenses in https://github.com/thunderpoot/curselib/blob/main/LICENSE were taken from ftp.gnu.org and are copyrighted by the Free Software Foundation, Inc."
+    ?# 1, "Copyright (C) " + local_c$ + " " + local_a$ + "."
+    ?# 1, " "
+    ?# 1, "This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version."
+    ?# 1, "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details."
+    ?# 1, " "
+    ?# 1, "[https://github.com/thunderpoot/curselib/]"
+    gosub 300
     goto 100
 
 300 REM Usage info
-    ? "Usage: " argv$(0) " <args>"
-    ? " --version        Show version info and quit"
-    ? " --help           Show this help"
-    ? " --notitle        Disable the title bar"
-    ? " --yn             Yes/No prompt"
-    ? " --input          Prompt for user input, output to " outFile$
-    ? " --force          Force overwrite of output file if not a temporary file"
-    ? " --cls            Clear screen on program exit"
-    ? " --progress=<N>   Show progress bar (N must be between 0 and 100)"
-    ? " --colour=<text>  Foreground colour ('color' is also supported)"
-    ? " --width=<N>      Box width"
-    ? " --pname=<text>   Header title"
-    ? " --title=<text>   Box title"
-    ? " --msg=<text>     Box message"
-    ? " --btn=<text>     Info-Box button"
-    ? " --out=<text>     Output filename (for use with input option)"
-    ? " --func=<cmd>     Command to execute on prompt confirmation"
-    ? crlf$ "Example:" crlf$ "@run " argv$(0) " --yn --func='echo foo bar'"
+    ?# 1, " "
+    ?# 1, "Usage: " + argv$(0) + " <args>"
+    ?# 1, " --version        Show version info and quit"
+    ?# 1, " --help           Show this help"
+    ?# 1, " --notitle        Disable the title bar"
+    ?# 1, " --yn             Yes/No prompt"
+    ?# 1, " --input          Prompt for user input, output to file (see: DEFAULTS)"
+    ?# 1, " --force          Force overwrite of output file"
+    ?# 1, " --cls            Clear screen on program exit"
+    ?# 1, " --progress=<N>   Show progress bar (N must be between 0 and 100)"
+    ?# 1, " --colour=<text>  Foreground colour ('color' is also supported)"
+    ?# 1, " --width=<N>      Box width"
+    ?# 1, " --pname=<text>   Header title"
+    ?# 1, " --title=<text>   Box title"
+    ?# 1, " --msg=<text>     Box message"
+    ?# 1, " --btn=<text>     Info-Box button label"
+    ?# 1, " --out=<text>     Output filename (for use with input option)"
+    ?# 1, " --func=<cmd>     Command to execute on prompt confirmation"
+    ?# 1, "Example:" "@run " + argv$(0) + " --yn --func='echo foo bar'"
+    close #1
+    cmd$ = "\less " + pagertmpfile$ : th_exec cmd$
+    cmd$ = "\rm " + pagertmpfile$ : th_exec cmd$ ; devnull$
     return
