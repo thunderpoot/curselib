@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.2.8"
+        local_v$ = "1.2.9"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -25,6 +25,7 @@ REM Init
             if ups$( argv$(i) ) = "PASS" or ups$( argv$(i) ) = "PASSWORD" or ups$( argv$(i) ) = "PASSWD" then : getUserText = 1 : passwd = 1 : cl = 1
             if ups$( argv$(i) ) = "FORCE" then : force = 1
             if ups$( argv$(i) ) = "DEBUG" then : debug = 1
+            if ups$( argv$(i) ) = "NOGFX" then : nogfx = 1
             if ups$( argv$(i) ) = "TRON" then : tron
             if ups$( argv$(i) ) = "YN" or ups$( argv$(i) ) = "YESNO" or ups$( argv$(i) ) = "YORN" then : yesno = 1
             if ups$( left$( argv$(i), 9 ) ) = "PROGRESS=" and len( argv$(i) ) > 9 then : progress = abs( mid$( argv$(i), 10 ) )
@@ -77,6 +78,7 @@ REM Init
 
     REM Box Elements
         tl$ = chr$(9484) : tr$ = chr$(9488) : bl$ = chr$(9492) : br$ = chr$(9496) : horiz$ = chr$(9472) : vert$ = chr$(9474)
+        if nogfx then : tl$ = "," : tr$ = "." : bl$ = "`" : br$ = "'" : horiz$ = "_" : vert$ = "|"
 
     REM Hide Cursor (REQUIRE CORE)
         ? esc$ "[?25l" ;
