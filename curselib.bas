@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.2.9"
+        local_v$ = "1.3.0"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -59,7 +59,7 @@ REM Init
         if progress < 0 then : progress                          = 0                     : REM Enforce Minimum Progress
         if progress > 100 then : progress                        = 100                   : REM Enforce Maximum Progress
         textFieldFormatting$                                     = ""                    : REM Text Field Formatting ( e.g: esc$ + "[7m" )
-        if left$( title$, 1 ) <> " " or right$( title$, 1 ) <> " " then title$ = " " + title + " "
+        if left$( title$, 1 ) <> " " or right$( title$, 1 ) <> " " then title$ = " " + title$ + " "
 
     REM Safety Checks
 
