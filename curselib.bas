@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.3.1"
+        local_v$ = "1.3.2"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -130,7 +130,7 @@ REM Runtime (REQUIRE FUNCTIONS)
     pwidth = width
 
     if not initialised then for l = 1 to len( choicesText$ ) :
-    if not initialised then     if mid$( choicesText$, l, 1 ) = delim$ then : nchoices = nchoices + 1 : if right$( choicesText$, 1 ) <> delim$ then : next l
+    if not initialised then     if mid$( choicesText$, l, len( delim$ ) ) = delim$ then : nchoices = nchoices + 1 : if right$( choicesText$, len( delim$ ) ) <> delim$ then : next l
     if not initialised then     myChoices$( nchoices ) = myChoices$( nchoices ) + mid$( choicesText$, l, 1 )
     if not initialised then next l
     initialised = 1
