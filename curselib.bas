@@ -4,7 +4,7 @@ REM Init
 
     REM Package Version & Information
         local_n$ = "curselib"
-        local_v$ = "1.3.0"
+        local_v$ = "1.3.1"
         local_a$ = "underwood@telehack.com"
         local_c$ = "2020 - " + str$( th_localtime(5) + 1900 )
 
@@ -21,7 +21,7 @@ REM Init
             if ups$( argv$(i) ) = "HELP" or ups$( argv$(i) ) = "H" or argv$(i) = "?" then : usage = 1 : goto 200
             if ups$( argv$(i) ) = "NOTITLE" or ups$( argv$(i) ) = "NOHEADER" then : titlebardisabled = 1
             if ups$( argv$(i) ) = "CLS" or ups$( argv$(i) ) = "CLEAR" then : cl = 1
-            if ups$( argv$(i) ) = "INPUT" or ups$( argv$(i) ) = "INPUTBOX" then : getUserText = 1
+            if ups$( argv$(i) ) = "INPUT" or ups$( argv$(i) ) = "INPUTBOX" then : getUserText = 1 : out = 1
             if ups$( argv$(i) ) = "PASS" or ups$( argv$(i) ) = "PASSWORD" or ups$( argv$(i) ) = "PASSWD" then : getUserText = 1 : passwd = 1 : cl = 1
             if ups$( argv$(i) ) = "FORCE" then : force = 1
             if ups$( argv$(i) ) = "DEBUG" then : debug = 1
