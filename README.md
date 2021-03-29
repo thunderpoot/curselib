@@ -7,7 +7,9 @@ It's written in BASIC for [Telehack](https://telehack.com).
 ![thcurses-demo](https://feen.us/1p6zjy.gif)
 
 ### Installation
-Copy the contents of `curselib.bas` into `ped`, exit and save as `curselib.bas` with `^D`.
+~~Copy the contents of `curselib.bas` into `ped`, exit and save as `curselib.bas` with `^D`.~~
+
+_Edit: as of February 2021 `curselib` is installed by default for all users at the main node.  No installation necessary!_
 
 ### Usage
 ```
