@@ -1,15 +1,16 @@
 # curselib
-curselib – ncurses-style interface for TeleBASIC
+curselib – ncurses dialog-style interface for TeleBASIC
 
 ## What?
-It's written in BASIC for [Telehack](https://telehack.com).
+It's written in BASIC for [Telehack](https://telehack.com). NOTE: As of January 2023 this software is ABANDONWARE.
 
 ![thcurses-demo](https://feen.us/1p6zjy.gif)
 
 ### Installation
-~~Copy the contents of `curselib.bas` into `ped`, exit and save as `curselib.bas` with `^D`.~~
+```
+@pub /get underwood/curselib.bas
+```
 
-_Edit: as of February 2021 `curselib` is installed by default for all users at the main node.  No installation necessary!_
 
 ### Usage
 ```
